@@ -4,13 +4,18 @@
   "description": "Starts a web server for http requests to change the light state of a connected Delcom LED indicator.",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "delcome",
+    "delcom",
     "http",
     "server"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-hid": "^0.7.9"
+  }
 }
