@@ -1,0 +1,16 @@
+{
+  "name": "delcom-led-server",
+  "version": "1.0.0",
+  "description": "Starts a web server for http requests to change the light state of a connected Delcom LED indicator.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "delcome",
+    "http",
+    "server"
+  ],
+  "author": "",
+  "license": "ISC"
+}
