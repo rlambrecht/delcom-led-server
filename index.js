@@ -7,13 +7,14 @@ const app = express();
 // Parse incoming requests data
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-const delcomIndicator = new DelcomIndicator();
+var delcomIndicator = new DelcomIndicator();
 const PORT = 5000;
 
-app.post("/api/v1/lightstate", (req, res) => {
-  if (!delcomIndicator.isConnected) {
-    const delcomIndicator = new DelcomIndicator();
-  }
+// Global Variables
+var currentStatus;
+var currentColor;
+
+app.post("/led/v1/status", (req, res) => {
   var status = req.body.status;
   var color = req.body.color;
   if (!delcomIndicator.isConnected()) {
@@ -28,22 +29,33 @@ app.post("/api/v1/lightstate", (req, res) => {
     });
   }
   // turn off before trying to change
-  delcomIndicator.turnOff();
+  try {
+    delcomIndicator.turnOff();
+  } catch {
+    delcomIndicator = new DelcomIndicator();
+  }
   switch (status) {
     case "off":
       delcomIndicator.turnOff();
+      currentStatus = "off";
       break;
     case "on":
       switch (req.body.color) {
         case "red":
           delcomIndicator.solidRed();
+          currentStatus = "on";
+          currentColor = "red";
           break;
         case "blue":
         case "yellow":
           delcomIndicator.solidBlue();
+          currentStatus = "on";
+          currentColor = "blue";
           break;
         case "green":
           delcomIndicator.solidGreen();
+          currentStatus = "on";
+          currentColor = "green";
           break;
         default:
           return res.status(400).send({
@@ -52,17 +64,23 @@ app.post("/api/v1/lightstate", (req, res) => {
           });
       }
       break;
-    case "blink":
+    case "flash":
       switch (req.body.color) {
         case "red":
           delcomIndicator.flashRed();
+          currentStatus = "flash";
+          currentColor = "red";
           break;
         case "blue":
         case "yellow":
           delcomIndicator.flashBlue();
+          currentStatus = "flash";
+          currentColor = "blue";
           break;
         case "green":
           delcomIndicator.flashGreen();
+          currentStatus = "flash";
+          currentColor = "green";
           break;
         default:
           return res.status(400).send({
@@ -81,6 +99,19 @@ app.post("/api/v1/lightstate", (req, res) => {
   return res.status(200).send({
     success: "true"
   });
+});
+
+app.get("/led/v1/status", (req, res) => {
+  if (!delcomIndicator.isConnected()) {
+    return res.status(404).send({
+      message: "no light is connected"
+    });
+  } else {
+    return res.status(200).send({
+      status: currentStatus,
+      color: currentStatus === "off" ? undefined : currentColor
+    });
+  }
 });
 
 app.listen(PORT, () => {
